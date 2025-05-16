@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="firebaseauth.js"></script>
+  <script type="module" src="logout.js"></script>
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <div class="logo">Telecovery</div>
+      <nav class="nav-bar">
+        <a href="index.html">Home</a>
+        <a href="patients_history.html">Patients History</a>
+        <a href="video_call.html">Video Call</a>
+        <a class="active-nav">Register/Login</a>
+      </nav>
+    </div>
+</header>
+<div class="reglog-container">
+  <div class="slider">
+    <button id="loginBtn" class="active">Login</button>
+    <button id="registerBtn">Register</button>
+  </div>
+  <div class="form-container">
+      <form id="loginForm" class="form active">
+        <h2>Login</h2>
+        <input type="email" id="logEmail" placeholder="Email" required>
+        <input type="password" id="logPsw" placeholder="Password" required>
+        <button type="submit" id="login-btn">Login</button>
+      </form>
+  
+      <form id="registerForm" class="form">
+        <h2>Register</h2>
+        <input type="text" id="firstName" placeholder="First Name" required>
+        <input type="text" id="lastName" placeholder="Last Name" required>
+        <input type="email" id="regEmail" placeholder="Email" required>
+        <input type="password" id="regPsw" placeholder="Password" required>
+        <div class="user-type">
+          <label><input type="radio" name="userType" value="patient" required> Patient</label>
+          <label><input type="radio" name="userType" value="doctor"> Doctor</label>
+        </div>
+        <button type="submit" id="register-btn">Register</button>
+      </form>
+    </div>
+  </div>
+  <footer>
+    <div class="foot">
+        <div class="contact">
+            <p>&#9743 Call us here:<br><a href="tel:6988048024">6988048024</a></p>
+            <p>&#9993 Send us here:<br><a href="mailto:marioslambousis@gmail.com">marioslambousis@gmail.com</a></p>
+        </div>
+    </div>
+</footer>
+  <script>
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+
+    loginBtn.addEventListener("click", () => {
+    loginForm.classList.add("active");
+    registerForm.classList.remove("active");
+    loginBtn.classList.add("active");
+    registerBtn.classList.remove("active");
+    });
+
+    registerBtn.addEventListener("click", () => {
+    registerForm.classList.add("active");
+    loginForm.classList.remove("active");
+    registerBtn.classList.add("active");
+    loginBtn.classList.remove("active");
+    });
+  </script>
+</body>
+</html>

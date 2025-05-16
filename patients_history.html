@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patients History</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <div class="logo">Telecovery</div>
+      <nav class="nav-bar">
+        <a href="index.html">Home</a>
+        <a id="history-link" class="active-nav disabled">Patients History</a>
+        <a id="video-link" class="disabled" href="#">Video Call</a>
+        <a id="auth-link" class="disabled" href="#">Register/Login</a>
+      </nav>
+    </div>
+  </header>
+  <table>
+    <thead>
+      <tr>
+        <th>Athlete ID</th>
+        <th>Age</th>
+        <th>Gender</th>
+        <th>Height (cm)</th>
+        <th>Weight (kg)</th>
+        <th>Position</th>
+        <th>Training Intensity</th>
+        <th>Training Hours/Week</th>
+        <th>Recovery Days/Week</th>
+        <th>Match Count/Week</th>
+        <th>Rest Between Events Days</th>
+        <th>Fatigue Score</th>
+        <th>Performance Score</th>
+        <th>Team Contribution Score</th>
+        <th>Load Balance Score</th>
+        <th>ACL Risk Score</th>
+        <th>Injury Indicator</th>
+      </tr>
+    </thead>
+    <tbody id="data-output">
+
+    </tbody>
+</table>
+  <nav>
+    <ul class="pagination justify-content-center" id="pagination"></ul>
+  </nav>
+  <footer>
+    <div class="foot">
+        <div class="contact">
+            <p>&#9743 Call us here:<br><a href="tel:6988048024">6988048024</a></p>
+            <p>&#9993 Send us here:<br><a href="mailto:marioslambousis@gmail.com">marioslambousis@gmail.com</a></p>
+        </div>
+    </div>
+</footer>
+  <script type="module" src="firebaseauth.js"></script>
+  <script type="module" src="logout.js"></script>
+  <script type="module" src="auth_status.js"></script>
+  <script>
+    const rowsPerPage = 20;
+let currentPage = 1;
+let athletes = [];
+
+function displayTable(page) {
+  const start = (page - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const paginatedItems = athletes.slice(start, end);
+
+  const placeholder = document.querySelector("#data-output");
+  let out = "";
+
+  for (let athlete of paginatedItems) {
+    out += `
+      <tr>
+        <td>${athlete.Athlete_ID}</td>
+        <td>${athlete.Age}</td>
+        <td>${athlete.Gender}</td>
+        <td>${athlete.Height_cm}</td>
+        <td>${athlete.Weight_kg}</td>
+        <td>${athlete.Position}</td>
+        <td>${athlete.Training_Intensity}</td>
+        <td>${athlete.Training_Hours_Per_Week}</td>
+        <td>${athlete.Recovery_Days_Per_Week}</td>
+        <td>${athlete.Match_Count_Per_Week}</td>
+        <td>${athlete.Rest_Between_Events_Days}</td>
+        <td>${athlete.Fatigue_Score}</td>
+        <td>${athlete.Performance_Score}</td>
+        <td>${athlete.Team_Contribution_Score}</td>
+        <td>${athlete.Load_Balance_Score}</td>
+        <td>${athlete.ACL_Risk_Score}</td>
+        <td>${athlete.Injury_Indicator}</td>
+      </tr>
+    `;
+  }
+
+  placeholder.innerHTML = out;
+}
+
+function setupPagination(totalRows) {
+  const pageCount = Math.ceil(totalRows / rowsPerPage);
+  const pagination = document.querySelector("#pagination");
+  pagination.innerHTML = "";
+
+  const createPageItem = (text, active = false, disabled = false, onClick = null) => {
+    const li = document.createElement("li");
+    li.className = `page-item ${active ? "active" : ""} ${disabled ? "disabled" : ""}`;
+    li.innerHTML = `<a class="page-link" href="#">${text}</a>`;
+    if (onClick) {
+      li.addEventListener("click", (e) => {
+        e.preventDefault();
+        onClick();
+      });
+    }
+    return li;
+  };
+
+  // Previous button
+  pagination.appendChild(
+    createPageItem("Previous", false, currentPage === 1, () => {
+      if (currentPage > 1) {
+        currentPage--;
+        displayTable(currentPage);
+        setupPagination(totalRows);
+      }
+    })
+  );
+
+  const addDots = () => {
+    const dots = document.createElement("li");
+    dots.className = "page-item disabled";
+    dots.innerHTML = `<span class="page-link">...</span>`;
+    pagination.appendChild(dots);
+  };
+
+  const addPage = (page) => {
+    pagination.appendChild(
+      createPageItem(page, currentPage === page, false, () => {
+        currentPage = page;
+        displayTable(currentPage);
+        setupPagination(totalRows);
+      })
+    );
+  };
+
+  if (pageCount <= 7) {
+    for (let i = 1; i <= pageCount; i++) addPage(i);
+  } else {
+    if (currentPage <= 4) {
+      for (let i = 1; i <= 5; i++) addPage(i);
+      addDots();
+      addPage(pageCount);
+    } else if (currentPage >= pageCount - 3) {
+      addPage(1);
+      addDots();
+      for (let i = pageCount - 4; i <= pageCount; i++) addPage(i);
+    } else {
+      addPage(1);
+      addDots();
+      for (let i = currentPage - 1; i <= currentPage + 1; i++) addPage(i);
+      addDots();
+      addPage(pageCount);
+    }
+  }
+
+  // Next button
+  pagination.appendChild(
+    createPageItem("Next", false, currentPage === pageCount, () => {
+      if (currentPage < pageCount) {
+        currentPage++;
+        displayTable(currentPage);
+        setupPagination(totalRows);
+      }
+    })
+  );
+}
+
+// Fetch data and initialize
+fetch("athletes.json")
+  .then((response) => response.json())
+  .then((data) => {
+    athletes = data;
+    displayTable(currentPage);
+    setupPagination(athletes.length);
+});
+  </script>
+</body>
+</html>
